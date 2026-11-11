@@ -14,6 +14,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--text); }
 .shell { width: min(880px, calc(100% - 36px)); margin: 0 auto; }
 .site-header { border-bottom: 1px solid var(--border); background: rgba(247, 245, 240, .94); backdrop-filter: blur(12px); }
@@ -43,6 +44,31 @@ button:hover, button:focus-visible { border-color: var(--accent-hover); backgrou
 button:disabled { cursor: default; opacity: .55; }
 button.secondary { border-color: #ccd6ce; background: #fff; color: var(--accent-hover); }
 button.secondary:hover, button.secondary:focus-visible { border-color: var(--accent); background: var(--accent-surface); }
+button.secondary.danger { border-color: #dfc6c3; color: var(--error); }
+.resume-upload { display: flex; align-items: center; gap: 12px; border: 1px dashed #cbd5cc; border-radius: 12px; padding: 14px; background: #fbfcfa; }
+.resume-upload input[type="file"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.file-button { display: inline-flex; min-height: 40px; align-items: center; border: 1px solid var(--accent); border-radius: 10px; padding: 0 15px; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; }
+.file-copy { display: grid; min-width: 0; flex: 1; gap: 3px; font-size: 11px; }
+.file-copy strong { overflow: hidden; color: var(--text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.file-copy span, .privacy-note, .review-heading p { color: var(--muted); font-size: 11px; }
+.privacy-note { margin: 9px 2px 0; }
+.privacy-note code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.import-review { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+.review-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.review-heading h3 { margin: 0; font-size: 14px; }
+.review-heading p { margin: 4px 0 0; }
+.local-badge { border-radius: 999px; padding: 4px 8px; background: var(--accent-surface); color: var(--accent); font-size: 10px; font-weight: 700; }
+.resume-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.resume-fact { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; border: 1px solid var(--border); border-radius: 10px; padding: 9px; background: #fbfcfa; }
+.resume-fact input { width: auto; margin: 3px 0 0; accent-color: var(--accent); }
+.resume-fact-copy { min-width: 0; }
+.resume-fact-copy strong, .resume-fact-copy span, .resume-fact-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resume-fact-copy strong { font-size: 11px; }
+.resume-fact-copy span { margin-top: 2px; color: var(--text); font-size: 12px; font-weight: 400; }
+.resume-fact-copy small { margin-top: 2px; font-size: 10px; }
+.resume-text-editor { margin-top: 14px; }
+.review-actions { display: flex; gap: 8px; margin-top: 12px; }
+.inline-status { min-height: 16px; margin-top: 9px; color: var(--muted); font-size: 11px; }
 .save-bar { position: fixed; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: flex-end; gap: 16px; border-top: 1px solid var(--border); padding: 12px max(18px, calc((100% - 880px) / 2)); background: rgba(247, 245, 240, .95); backdrop-filter: blur(12px); }
 #save-status, #test-status { color: var(--muted); font-size: 11px; }
 .success { color: var(--success) !important; }
@@ -50,6 +76,9 @@ button.secondary:hover, button.secondary:focus-visible { border-color: var(--acc
 
 @media (max-width: 650px) {
   .grid.two { grid-template-columns: 1fr; }
+  .resume-facts { grid-template-columns: 1fr; }
+  .resume-upload { align-items: stretch; flex-direction: column; }
+  .file-button { justify-content: center; }
   .wide { grid-column: auto; }
   section { padding: 18px; }
 }

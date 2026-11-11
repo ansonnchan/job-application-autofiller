@@ -19,6 +19,7 @@ The current version includes:
 - An in-popup profile editor for contact details, location, links, and education, with advanced experience, résumé, and AI settings available from the gear menu.
 - Structured phone input with selectable country calling codes while retaining a combined number for application forms.
 - Country selection plus province/state suggestions for Canada and the United States.
+- Local résumé PDF upload with bundled PDF.js text extraction and a contact-detail import review.
 - Generic field recognition using labels, accessibility attributes, names, IDs, and placeholders.
 - A review panel where values can be edited, included, or excluded before filling.
 - Native text, select, date, and month input handling with framework-compatible events.
@@ -44,6 +45,7 @@ flowchart TD
     K --> X
 
     P[Profile editor] --> L[(chrome.storage.local)]
+    PDF[Résumé PDF] -->|Local PDF.js extraction| P
     L --> M
     L --> A[Optional AI provider]
 ```
@@ -53,6 +55,7 @@ flowchart TD
 koalified is designed for a private, trusted browser profile:
 
 - Profile data and API configuration stay in `chrome.storage.local`.
+- Résumé PDF extraction happens locally; choosing a PDF does not contact an AI provider.
 - Nothing is filled without an explicit user action.
 - The review-first workflow shows proposed values before changing the page.
 - Unknown fields are left blank instead of guessed.
@@ -78,13 +81,16 @@ After pulling or editing code, reload the extension from `chrome://extensions` a
 
 ## Development
 
-The extension currently has no runtime dependencies or build step.
+The extension ships the PDF.js browser files it needs, so loading the unpacked extension does not require a build step. For development:
 
 ```bash
+npm ci
 npm test
 ```
 
-The matching core has unit coverage for common labels, safety exclusions, degree fallbacks, date formatting, and custom-combobox matching.
+After changing the `pdfjs-dist` version, refresh the checked-in browser files with `npm run vendor:pdfjs`.
+
+The matching and import cores have unit coverage for common labels, safety exclusions, degree fallbacks, date formatting, custom-combobox matching, and résumé contact detection.
 
 ## AI providers
 

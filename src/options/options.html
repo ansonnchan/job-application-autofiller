@@ -67,10 +67,21 @@
         </section>
 
         <section>
-          <div class="section-heading"><div><h2>Résumé context</h2><p>Used only for AI drafts you explicitly request.</p></div></div>
-          <div class="grid">
-            <label>Résumé text<textarea name="resumeText" rows="12" placeholder="Paste résumé text here. Local PDF extraction will be added next."></textarea></label>
+          <div class="section-heading"><div><h2>Résumé</h2><p>Upload a PDF once. Text extraction and review happen locally in this extension.</p></div></div>
+          <div class="resume-upload">
+            <input id="resume-file" type="file" accept=".pdf,application/pdf">
+            <label class="file-button" for="resume-file">Choose résumé PDF</label>
+            <div class="file-copy"><strong id="resume-file-name">No PDF stored</strong><span id="resume-file-meta">PDF only · 5 MB maximum</span></div>
+            <button type="button" class="secondary danger" id="remove-resume" hidden>Remove</button>
           </div>
+          <p class="privacy-note">The PDF stays in <code>chrome.storage.local</code>. Choosing a file does not contact your AI provider.</p>
+          <div id="resume-import-review" class="import-review" hidden>
+            <div class="review-heading"><div><h3>Review résumé import</h3><p id="resume-review-summary"></p></div><span class="local-badge">Local</span></div>
+            <div id="resume-facts" class="resume-facts"></div>
+          </div>
+          <label class="resume-text-editor">Résumé text<textarea name="resumeText" id="resume-text" rows="14" placeholder="Upload a PDF to extract this locally, or paste résumé text here."></textarea></label>
+          <div id="resume-review-actions" class="review-actions" hidden><button type="button" id="apply-resume-import">Apply selected details</button><button type="button" class="secondary" id="cancel-resume-import">Cancel</button></div>
+          <div id="resume-import-status" class="inline-status" role="status"></div>
         </section>
 
         <section>
@@ -93,6 +104,7 @@
       </form>
     </main>
     <script src="../core/profile.js"></script>
+    <script src="../core/resume.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

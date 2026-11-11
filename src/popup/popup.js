@@ -55,9 +55,12 @@ async function initialize() {
       profile
     });
     if (!result?.ok) throw new Error(result?.error || "Could not scan this page.");
+    const missing = (result.missingProfile || []).map(profileFieldLabel);
     readyStatus.textContent = result.count
-      ? `${result.count} field${result.count === 1 ? "" : "s"} ready for review`
-      : "Nothing to review just yet.";
+      ? `${result.count} field${result.count === 1 ? "" : "s"} ready${missing.length ? ` · add ${missing.join(", ")} to fill more` : " for review"}`
+      : missing.length
+        ? `Recognized ${missing.join(", ")}, but it is missing from My profile.`
+        : "Nothing to review just yet.";
     reviewButton.disabled = result.count === 0;
   } catch (error) {
     console.error("koalified popup initialization failed", error);
@@ -229,6 +232,32 @@ function renderPreviewState() {
 function showFriendlyError(text) {
   message.textContent = text;
   reviewButton.disabled = true;
+}
+
+function profileFieldLabel(key) {
+  const labels = {
+    firstName: "first name",
+    lastName: "last name",
+    preferredName: "preferred name",
+    email: "email",
+    phone: "phone",
+    addressLine1: "street address",
+    addressLine2: "address line 2",
+    city: "city",
+    region: "province/state",
+    postalCode: "postal/ZIP code",
+    country: "country",
+    linkedin: "LinkedIn",
+    github: "GitHub",
+    portfolio: "portfolio",
+    school: "school",
+    degree: "degree",
+    fieldOfStudy: "field of study",
+    educationStartDate: "education start date",
+    graduationDate: "graduation date",
+    gpa: "GPA"
+  };
+  return labels[key] || key;
 }
 
 function hasExtensionApis() {

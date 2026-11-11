@@ -14,12 +14,12 @@
     rule("lastName", ["last name", "family name", "surname"], 1),
     rule("preferredName", ["preferred name", "chosen name", "nickname"], 0.98),
     rule("email", ["email address", "email", "e-mail"], 1),
-    rule("phone", ["phone number", "mobile number", "telephone", "phone", "mobile"], 0.98),
-    rule("addressLine1", ["address line 1", "street address", "home address", "address"], 0.92),
+    rule("phone", ["phone number", "mobile number", "telephone", "tel national", "phone", "mobile"], 0.98),
+    rule("addressLine1", ["address line 1", "address line1", "street address", "home address", "street-address", "address"], 0.92),
     rule("addressLine2", ["address line 2", "apartment", "apt", "unit", "suite"], 0.97),
-    rule("city", ["city", "town"], 0.96),
-    rule("region", ["state province", "state/province", "province", "state", "region"], 0.93),
-    rule("postalCode", ["postal code", "zip code", "zip", "postcode"], 0.98),
+    rule("city", ["location city", "address level2", "city", "town"], 0.96),
+    rule("region", ["state province", "state/province", "address level1", "province", "state", "region"], 0.93),
+    rule("postalCode", ["postal code", "zip code", "postal-code", "zip", "postcode"], 0.98),
     rule("country", ["country of residence", "country"], 0.96),
     rule("linkedin", ["linkedin profile", "linkedin url", "linkedin"], 1),
     rule("github", ["github profile", "github url", "github"], 1),
@@ -74,12 +74,12 @@
         const specificity = normalizedAlias.length / Math.max(normalizedLabel.length, 1);
         const score = candidate.confidence * (exact ? 1 : 0.88 + specificity * 0.1);
         if (!best || score > best.score || (score === best.score && normalizedAlias.length > best.alias.length)) {
-          best = { key: candidate.key, confidence: Math.min(score, 1), alias: normalizedAlias };
+          best = { key: candidate.key, score: Math.min(score, 1), alias: normalizedAlias };
         }
       }
     }
 
-    return best ? { key: best.key, confidence: Number(best.confidence.toFixed(2)) } : null;
+    return best ? { key: best.key, confidence: Number(best.score.toFixed(2)) } : null;
   }
 
   function getProfileValue(profile, key) {
@@ -156,7 +156,11 @@
   }
 
   function propose(field, profile) {
-    if (!field || field.disabled || (field.readOnly && field.role !== "combobox")) return null;
+    const suggestionControl =
+      field?.role === "combobox" ||
+      field?.ariaAutocomplete === "list" ||
+      field?.hasPopup === "listbox";
+    if (!field || field.disabled || (field.readOnly && !suggestionControl)) return null;
     if (field.tagName === "textarea") return null;
     if (["hidden", "password", "file", "submit", "button", "reset", "image", "checkbox", "radio"].includes(field.type)) return null;
 

@@ -17,6 +17,9 @@ test("classifies common label variants", () => {
   assert.equal(matcher.classifyField("Given name (required)").key, "firstName");
   assert.equal(matcher.classifyField("Expected Graduation Date").key, "graduationDate");
   assert.equal(matcher.classifyField("LinkedIn profile URL").key, "linkedin");
+  assert.equal(matcher.classifyField("Location (City) *").key, "city");
+  assert.equal(matcher.classifyField("address-level2").key, "city");
+  assert.equal(matcher.classifyField("tel-national").key, "phone");
 });
 
 test("does not classify submission or sensitive controls", () => {
@@ -96,4 +99,18 @@ test("allows read-only custom comboboxes to be matched for click interaction", (
     profile
   );
   assert.equal(proposal.value, "Computer Engineering");
+});
+
+test("allows ARIA autocomplete fields without an explicit combobox role", () => {
+  const proposal = matcher.propose(
+    {
+      label: "Location (City)",
+      type: "text",
+      tagName: "input",
+      ariaAutocomplete: "list",
+      readOnly: true
+    },
+    profile
+  );
+  assert.equal(proposal.value, "Vancouver");
 });

@@ -1,0 +1,12 @@
+{
+  "name": "koalified",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A little local-first help with job applications.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

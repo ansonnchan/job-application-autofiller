@@ -19,7 +19,7 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 .site-header { border-bottom: 1px solid var(--border); background: rgba(247, 245, 240, .94); backdrop-filter: blur(12px); }
 .brand { display: flex; min-height: 82px; align-items: center; gap: 13px; }
 .mascot-wrap { display: grid; width: 48px; height: 48px; overflow: hidden; place-items: center; border-radius: 15px; background: var(--accent-surface); }
-.mascot-wrap img { width: 44px; height: 44px; object-fit: cover; }
+.mascot-wrap img { width: 42px; height: 42px; object-fit: contain; }
 h1 { margin: 0; font-size: 21px; font-weight: 720; letter-spacing: -.25px; }
 .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
 main { padding: 26px 0 90px; }

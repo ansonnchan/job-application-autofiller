@@ -4,9 +4,13 @@
   "private": true,
   "description": "A little local-first help with job applications.",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "vendor:pdfjs": "node scripts/sync-pdfjs.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "6.2.108"
   }
 }

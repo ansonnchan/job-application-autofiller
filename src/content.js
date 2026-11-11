@@ -7,6 +7,7 @@
   const matcher = globalThis.KoalifiedMatcher;
   const PANEL_ID = "koalified-review-panel";
   let currentProposals = [];
+  let currentMissingProfile = [];
   let currentProfile = {};
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -21,17 +22,24 @@
 
   async function handleMessage(message) {
     currentProfile = message.profile || {};
-    currentProposals = analyzePage(currentProfile);
+    const analysis = analyzePage(currentProfile);
+    currentProposals = analysis.proposals;
+    currentMissingProfile = analysis.missingProfile;
     if (message.type === "KOALIFIED_SCAN") {
       return {
         ok: true,
         count: currentProposals.length,
-        categories: summarizeCategories(currentProposals)
+        categories: summarizeCategories(currentProposals),
+        missingProfile: currentMissingProfile
       };
     }
     if (message.type === "KOALIFIED_ANALYZE") {
-      renderReviewPanel(currentProposals);
-      return { ok: true, count: currentProposals.length };
+      renderReviewPanel(currentProposals, currentMissingProfile);
+      return {
+        ok: true,
+        count: currentProposals.length,
+        missingProfile: currentMissingProfile
+      };
     }
 
     const results = [];
@@ -49,18 +57,29 @@
 
   function analyzePage(profile) {
     removeExistingPanel();
-    return Array.from(document.querySelectorAll("input, select, textarea, [role='combobox']"))
+    const proposals = [];
+    const missingProfile = new Set();
+    const elements = Array.from(document.querySelectorAll("input, select, textarea, [role='combobox']"))
       .filter((element) => {
         if (element.matches("input, select, textarea")) return true;
         return !element.querySelector("input, select, textarea, [role='combobox']");
       })
-      .filter(isUsable)
-      .map((element, index) => {
-        const field = describeField(element);
-        const proposal = matcher.propose(field, profile);
-        return proposal ? { ...proposal, id: `field-${index}`, element, field } : null;
-      })
-      .filter(Boolean);
+      .filter(isUsable);
+
+    elements.forEach((element, index) => {
+      const field = describeField(element);
+      const classification = matcher.classifyField(field.label);
+      const proposal = matcher.propose(field, profile);
+      if (proposal) {
+        proposals.push({ ...proposal, id: `field-${index}`, element, field });
+        return;
+      }
+      if (classification && !matcher.getProfileValue(profile, classification.key)) {
+        missingProfile.add(classification.key);
+      }
+    });
+
+    return { proposals, missingProfile: [...missingProfile] };
   }
 
   function isUsable(element) {
@@ -68,7 +87,7 @@
     const rect = element.getBoundingClientRect();
     return (
       !element.disabled &&
-      (!element.readOnly || element.getAttribute("role") === "combobox") &&
+      (!element.readOnly || isSuggestionControl(element)) &&
       style.display !== "none" &&
       style.visibility !== "hidden" &&
       rect.width > 0 &&
@@ -88,6 +107,8 @@
       type: String(element.type || "text").toLowerCase(),
       tagName: element.tagName.toLowerCase(),
       role: element.getAttribute("role") || "",
+      ariaAutocomplete: element.getAttribute("aria-autocomplete") || "",
+      hasPopup: element.getAttribute("aria-haspopup") || "",
       placeholder: element.getAttribute("placeholder") || "",
       disabled: element.disabled,
       readOnly: element.readOnly,
@@ -107,8 +128,11 @@
       element.getAttribute("aria-label") || "",
       getAriaLabelledBy(element),
       element.getAttribute("placeholder") || "",
+      element.getAttribute("autocomplete") || "",
       element.getAttribute("name") || "",
-      element.getAttribute("id") || ""
+      element.getAttribute("id") || "",
+      element.getAttribute("data-automation-id") || "",
+      element.getAttribute("data-testid") || ""
     );
     const parentText = element.closest(
       "label, [role='group'], .form-field, .field, .field-wrapper, .form-group"
@@ -145,7 +169,7 @@
   async function fillProposal(proposal, profile) {
     try {
       const isCustomCombobox =
-        proposal.field.role === "combobox" && !(proposal.element instanceof HTMLSelectElement);
+        isSuggestionControl(proposal.element) && !(proposal.element instanceof HTMLSelectElement);
       const ok = isCustomCombobox
         ? await fillCustomCombobox(proposal, profile)
         : fillNativeElement(proposal.element, proposal.value);
@@ -173,7 +197,7 @@
       const uniqueDesired = [...new Set(desired.filter(Boolean))];
       for (const candidate of uniqueDesired) {
         setNativeValue(element, candidate);
-        dispatchValueEvents(element, candidate, false);
+        dispatchInputEvent(element, candidate);
         option = await waitForMatchingOption(element, [candidate]);
         if (option) break;
       }
@@ -190,16 +214,19 @@
     }
 
     option.scrollIntoView({ block: "nearest" });
+    option.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     option.click();
-    await delay(60);
+    await delay(100);
     element.dispatchEvent(new Event("change", { bubbles: true }));
+    element.dispatchEvent(new Event("blur", { bubbles: true }));
+    if (!comboboxValueCommitted(element, option, desired)) return false;
     markFilled(element);
     return true;
   }
 
   async function waitForMatchingOption(combobox, desiredValues) {
     const desired = desiredValues.map(matcher.normalize).filter(Boolean);
-    for (let attempt = 0; attempt < 8; attempt += 1) {
+    for (let attempt = 0; attempt < 15; attempt += 1) {
       const options = getCandidateOptions(combobox).filter(isUsable);
       const exact = options.find((option) => desired.includes(matcher.normalize(option.textContent)));
       if (exact) return exact;
@@ -226,7 +253,22 @@
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
-  function renderReviewPanel(proposals) {
+  function isSuggestionControl(element) {
+    return (
+      element?.getAttribute?.("role") === "combobox" ||
+      element?.getAttribute?.("aria-autocomplete") === "list" ||
+      element?.getAttribute?.("aria-haspopup") === "listbox"
+    );
+  }
+
+  function comboboxValueCommitted(element, option, desiredValues) {
+    if (!(element instanceof HTMLInputElement)) return true;
+    const actual = matcher.normalize(element.value);
+    const expected = [option.textContent, ...desiredValues].map(matcher.normalize).filter(Boolean);
+    return Boolean(actual) && expected.some((value) => actual === value || actual.includes(value) || value.includes(actual));
+  }
+
+  function renderReviewPanel(proposals, missingProfile = []) {
     const host = document.createElement("div");
     host.id = PANEL_ID;
     host.style.cssText =
@@ -272,7 +314,7 @@
 
     const summary = document.createElement("p");
     summary.className = "summary";
-    summary.textContent = `${proposals.length} field${proposals.length === 1 ? "" : "s"} matched. Review every value before filling.`;
+    summary.textContent = reviewSummary(proposals.length, missingProfile);
     const list = document.createElement("div");
     list.className = "list";
     const footer = document.createElement("footer");
@@ -404,13 +446,50 @@
   }
 
   function dispatchValueEvents(element, value, includeChange) {
+    dispatchInputEvent(element, value);
+    if (includeChange) element.dispatchEvent(new Event("change", { bubbles: true }));
+    element.dispatchEvent(new Event("blur", { bubbles: true }));
+  }
+
+  function dispatchInputEvent(element, value) {
     element.dispatchEvent(new InputEvent("input", {
       bubbles: true,
       inputType: "insertText",
       data: String(value)
     }));
-    if (includeChange) element.dispatchEvent(new Event("change", { bubbles: true }));
-    element.dispatchEvent(new Event("blur", { bubbles: true }));
+  }
+
+  function reviewSummary(count, missingProfile) {
+    const matched = `${count} field${count === 1 ? "" : "s"} matched.`;
+    if (!missingProfile.length) return `${matched} Review every value before filling.`;
+    const missing = missingProfile.map(profileFieldLabel).join(", ");
+    return `${matched} Add ${missing} to My profile to fill the other recognized field${missingProfile.length === 1 ? "" : "s"}.`;
+  }
+
+  function profileFieldLabel(key) {
+    const labels = {
+      firstName: "first name",
+      lastName: "last name",
+      preferredName: "preferred name",
+      email: "email",
+      phone: "phone",
+      addressLine1: "street address",
+      addressLine2: "address line 2",
+      city: "city",
+      region: "province/state",
+      postalCode: "postal/ZIP code",
+      country: "country",
+      linkedin: "LinkedIn",
+      github: "GitHub",
+      portfolio: "portfolio",
+      school: "school",
+      degree: "degree",
+      fieldOfStudy: "field of study",
+      educationStartDate: "education start date",
+      graduationDate: "graduation date",
+      gpa: "GPA"
+    };
+    return labels[key] || key;
   }
 
   function markFilled(element) {

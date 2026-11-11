@@ -97,9 +97,4 @@ Model names, free tiers, and provider data-use terms change over time. Confirm t
 
 ## Roadmap
 
-1. Local résumé PDF extraction and profile-import review.
-2. Inline AI drafting for open-ended questions and character limits.
-3. Greenhouse and Lever adapters.
-4. Repeated education and employment entries.
-5. Workday custom selects, typeaheads, and calendar adapters.
-6. Saved corrections, answer aliases, undo, and import/export backup.
+The full [product and engineering roadmap](ROADMAP.md) covers the reliability baseline, local résumé PDF import, inline AI drafting, repeated profile records, Greenhouse and Lever adapters, Workday controls, saved corrections, undo, backup, testing, and release quality.

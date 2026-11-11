@@ -1,16 +1,16 @@
 (() => {
   "use strict";
 
-  if (globalThis.__applyKitLoaded) return;
-  globalThis.__applyKitLoaded = true;
+  if (globalThis.__koalifiedLoaded) return;
+  globalThis.__koalifiedLoaded = true;
 
-  const matcher = globalThis.ApplyKitMatcher;
-  const PANEL_ID = "applykit-review-panel";
+  const matcher = globalThis.KoalifiedMatcher;
+  const PANEL_ID = "koalified-review-panel";
   let currentProposals = [];
   let currentProfile = {};
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (!["APPLYKIT_SCAN", "APPLYKIT_ANALYZE", "APPLYKIT_AUTOFILL"].includes(message?.type)) {
+    if (!["KOALIFIED_SCAN", "KOALIFIED_ANALYZE", "KOALIFIED_AUTOFILL"].includes(message?.type)) {
       return false;
     }
     handleMessage(message)
@@ -22,14 +22,14 @@
   async function handleMessage(message) {
     currentProfile = message.profile || {};
     currentProposals = analyzePage(currentProfile);
-    if (message.type === "APPLYKIT_SCAN") {
+    if (message.type === "KOALIFIED_SCAN") {
       return {
         ok: true,
         count: currentProposals.length,
         categories: summarizeCategories(currentProposals)
       };
     }
-    if (message.type === "APPLYKIT_ANALYZE") {
+    if (message.type === "KOALIFIED_ANALYZE") {
       renderReviewPanel(currentProposals);
       return { ok: true, count: currentProposals.length };
     }
@@ -481,13 +481,13 @@
   function highlight(element, enabled) {
     if (!element?.isConnected) return;
     if (enabled) {
-      element.dataset.applyKitPreviousOutline = element.style.outline;
+      element.dataset.koalifiedPreviousOutline = element.style.outline;
       element.style.outline = "3px solid #b58a43";
       element.style.outlineOffset = "2px";
       element.scrollIntoView({ block: "center", behavior: "smooth" });
     } else {
-      element.style.outline = element.dataset.applyKitPreviousOutline || "";
-      delete element.dataset.applyKitPreviousOutline;
+      element.style.outline = element.dataset.koalifiedPreviousOutline || "";
+      delete element.dataset.koalifiedPreviousOutline;
     }
   }
 

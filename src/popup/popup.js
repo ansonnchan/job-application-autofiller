@@ -39,7 +39,7 @@ async function initialize() {
     pageHost.textContent = url.hostname.replace(/^www\./, "");
     await injectPageScripts();
     const result = await chrome.tabs.sendMessage(activeTab.id, {
-      type: "APPLYKIT_SCAN",
+      type: "KOALIFIED_SCAN",
       profile
     });
     if (!result?.ok) throw new Error(result?.error || "Could not scan this page.");
@@ -69,7 +69,7 @@ reviewButton.addEventListener("click", async () => {
   try {
     await injectPageScripts();
     const response = await chrome.tabs.sendMessage(activeTab.id, {
-      type: "APPLYKIT_ANALYZE",
+      type: "KOALIFIED_ANALYZE",
       profile
     });
     if (!response?.ok) throw new Error(response?.error || "Review could not be opened.");

@@ -39,7 +39,7 @@ testButton.addEventListener("click", async () => {
   try {
     await saveSettings();
     await ensureEndpointPermission();
-    const response = await chrome.runtime.sendMessage({ type: "APPLYKIT_TEST_AI" });
+    const response = await chrome.runtime.sendMessage({ type: "KOALIFIED_TEST_AI" });
     if (!response?.ok) throw new Error(response?.error || "Provider test failed.");
     showStatus(testStatus, `Connected successfully: ${response.answer}`, "success");
   } catch (error) {

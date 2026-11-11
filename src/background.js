@@ -26,14 +26,14 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === "APPLYKIT_DRAFT_ANSWER") {
+  if (message?.type === "KOALIFIED_DRAFT_ANSWER") {
     createDraft(message.payload)
       .then((answer) => sendResponse({ ok: true, answer }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 
-  if (message?.type === "APPLYKIT_TEST_AI") {
+  if (message?.type === "KOALIFIED_TEST_AI") {
     testProvider()
       .then((answer) => sendResponse({ ok: true, answer }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
@@ -62,7 +62,7 @@ async function autofillActiveTab() {
     target: { tabId: tab.id },
     files: ["src/core/matcher.js", "src/content.js"]
   });
-  return chrome.tabs.sendMessage(tab.id, { type: "APPLYKIT_AUTOFILL", profile });
+  return chrome.tabs.sendMessage(tab.id, { type: "KOALIFIED_AUTOFILL", profile });
 }
 
 async function testProvider() {

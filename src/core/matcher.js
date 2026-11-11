@@ -1,6 +1,6 @@
 (function initializeMatcher(root, factory) {
   const api = factory();
-  root.ApplyKitMatcher = api;
+  root.KoalifiedMatcher = api;
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;

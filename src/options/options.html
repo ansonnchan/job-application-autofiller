@@ -20,7 +20,8 @@
             <label>Last name<input name="personal.lastName" autocomplete="family-name"></label>
             <label>Preferred name<input name="personal.preferredName"></label>
             <label>Email<input name="personal.email" type="email" autocomplete="email"></label>
-            <label>Phone<input name="personal.phone" type="tel" autocomplete="tel"></label>
+            <label>Phone country<select name="personal.phoneCountry" id="phone-country"></select></label>
+            <label>Phone number<input name="personal.phoneNumber" type="tel" autocomplete="tel-national" placeholder="604 555 0100"></label>
           </div>
         </section>
 
@@ -30,9 +31,9 @@
             <label class="wide">Address line 1<input name="address.line1" autocomplete="address-line1"></label>
             <label class="wide">Address line 2<input name="address.line2" autocomplete="address-line2"></label>
             <label>City<input name="address.city" autocomplete="address-level2"></label>
-            <label>Province / state<input name="address.region" autocomplete="address-level1"></label>
+            <label>Province / state<input name="address.region" id="location-region" list="region-options" autocomplete="address-level1"><datalist id="region-options"></datalist></label>
             <label>Postal / ZIP code<input name="address.postalCode" autocomplete="postal-code"></label>
-            <label>Country<input name="address.country" autocomplete="country-name"></label>
+            <label>Country<select name="address.country" id="location-country" autocomplete="country-name"></select></label>
           </div>
         </section>
 
@@ -91,6 +92,7 @@
         <div class="save-bar"><span id="save-status" role="status"></span><button type="submit">Save profile</button></div>
       </form>
     </main>
+    <script src="../core/profile.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

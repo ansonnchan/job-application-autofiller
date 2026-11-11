@@ -18,11 +18,11 @@
     </header>
 
     <nav class="tabs" aria-label="koalified sections">
-      <button class="tab active" type="button">Autofill</button>
+      <button class="tab active" id="autofill-tab" type="button">Autofill</button>
       <button class="tab" id="profile-tab" type="button">My profile</button>
     </nav>
 
-    <main>
+    <main id="autofill-view">
       <section class="application-card" aria-labelledby="application-title">
         <div class="application-heading">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.75h8.5L19.25 7.5V20.25H7A2.25 2.25 0 0 1 4.75 18V6A2.25 2.25 0 0 1 7 3.75Z"/><path d="M15.25 4v4h3.75M8.5 12h7M8.5 15.5h5"/></svg>
@@ -61,6 +61,57 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
+
+    <main class="profile-view" id="profile-view" hidden>
+      <form id="profile-form">
+        <div class="profile-intro"><h2>My profile</h2><p>Saved only in this Chrome profile.</p></div>
+
+        <fieldset>
+          <legend>Personal details</legend>
+          <div class="form-grid two">
+            <label>First name<input name="personal.firstName" autocomplete="given-name"></label>
+            <label>Last name<input name="personal.lastName" autocomplete="family-name"></label>
+            <label class="wide">Email<input name="personal.email" type="email" autocomplete="email"></label>
+            <label>Phone country<select name="personal.phoneCountry" id="popup-phone-country"></select></label>
+            <label>Phone number<input name="personal.phoneNumber" type="tel" autocomplete="tel-national" placeholder="604 555 0100"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Location</legend>
+          <div class="form-grid two">
+            <label class="wide">Country<select name="address.country" id="popup-location-country"></select></label>
+            <label class="wide">Province / state<input name="address.region" id="popup-location-region" list="popup-region-options" autocomplete="address-level1"><datalist id="popup-region-options"></datalist></label>
+            <label>City<input name="address.city" autocomplete="address-level2"></label>
+            <label>Postal / ZIP code<input name="address.postalCode" autocomplete="postal-code"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Education</legend>
+          <div class="form-grid two">
+            <label class="wide">School / university<input name="education.school"></label>
+            <label>Degree<input name="education.degree"></label>
+            <label>Field of study<input name="education.fieldOfStudy"></label>
+            <label class="wide">Expected graduation<input name="education.graduationDate" type="month"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Links</legend>
+          <div class="form-grid">
+            <label>LinkedIn URL<input name="links.linkedin" type="url"></label>
+            <label>GitHub URL<input name="links.github" type="url"></label>
+            <label>Portfolio URL<input name="links.portfolio" type="url"></label>
+          </div>
+        </fieldset>
+
+        <p class="profile-save-status" id="profile-save-status" role="status"></p>
+        <button class="save-profile" type="submit">Save profile</button>
+        <button class="advanced-settings" id="advanced-settings" type="button">Experience, résumé, and AI settings</button>
+      </form>
+    </main>
+    <script src="../core/profile.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

@@ -1,9 +1,16 @@
 const reviewButton = document.getElementById("review-page");
-const settingsButtons = [
-  document.getElementById("open-settings"),
-  document.getElementById("edit-profile"),
-  document.getElementById("profile-tab")
-];
+const settingsButton = document.getElementById("open-settings");
+const advancedSettingsButton = document.getElementById("advanced-settings");
+const editProfileButton = document.getElementById("edit-profile");
+const autofillTab = document.getElementById("autofill-tab");
+const profileTab = document.getElementById("profile-tab");
+const autofillView = document.getElementById("autofill-view");
+const profileView = document.getElementById("profile-view");
+const profileForm = document.getElementById("profile-form");
+const profileSaveStatus = document.getElementById("profile-save-status");
+const phoneCountry = document.getElementById("popup-phone-country");
+const locationCountry = document.getElementById("popup-location-country");
+const regionOptions = document.getElementById("popup-region-options");
 const readyStatus = document.getElementById("ready-status");
 const profileSummary = document.getElementById("profile-summary");
 const pageTitle = document.getElementById("page-title");
@@ -11,10 +18,13 @@ const pageHost = document.getElementById("page-host");
 const resumeStatus = document.getElementById("resume-status");
 const aiStatus = document.getElementById("ai-status");
 const message = document.getElementById("message");
+const profileHelpers = globalThis.KoalifiedProfile;
 
 let activeTab = null;
 let profile = {};
+let aiConfig = {};
 
+populateCountryControls();
 initialize();
 
 async function initialize() {
@@ -26,8 +36,10 @@ async function initialize() {
 
   try {
     const stored = await chrome.storage.local.get(["profile", "ai"]);
-    profile = stored.profile || {};
-    renderProfile(profile, stored.ai || {});
+    profile = profileHelpers.migrateProfile(stored.profile || {});
+    aiConfig = stored.ai || {};
+    populateProfileForm(profile);
+    renderProfile(profile, aiConfig);
     [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!activeTab?.id || !/^https?:/i.test(activeTab.url || "")) {
       renderNoApplication("Open a job application to get started.");
@@ -53,10 +65,19 @@ async function initialize() {
   }
 }
 
-settingsButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    if (hasExtensionApis()) chrome.runtime.openOptionsPage();
-  });
+settingsButton.addEventListener("click", openAdvancedSettings);
+advancedSettingsButton.addEventListener("click", openAdvancedSettings);
+autofillTab.addEventListener("click", () => showView("autofill"));
+profileTab.addEventListener("click", () => showView("profile"));
+editProfileButton.addEventListener("click", () => showView("profile"));
+locationCountry.addEventListener("change", updateRegionOptions);
+
+profileForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  profile = readProfileForm(profile);
+  if (hasExtensionApis()) await chrome.storage.local.set({ profile });
+  renderProfile(profile, aiConfig);
+  profileSaveStatus.textContent = "Saved locally.";
 });
 
 reviewButton.addEventListener("click", async () => {
@@ -89,6 +110,84 @@ async function injectPageScripts() {
   });
 }
 
+function showView(view) {
+  const showProfile = view === "profile";
+  autofillView.hidden = showProfile;
+  profileView.hidden = !showProfile;
+  autofillTab.classList.toggle("active", !showProfile);
+  profileTab.classList.toggle("active", showProfile);
+  if (showProfile) populateProfileForm(profile);
+}
+
+function openAdvancedSettings() {
+  if (hasExtensionApis()) chrome.runtime.openOptionsPage();
+}
+
+function populateCountryControls() {
+  phoneCountry.replaceChildren(...profileHelpers.COUNTRIES.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = `${item.name} (${item.dialCode})`;
+    return option;
+  }));
+  locationCountry.replaceChildren(...profileHelpers.COUNTRIES.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = item.name;
+    return option;
+  }));
+}
+
+function populateProfileForm(currentProfile) {
+  for (const element of profileForm.elements) {
+    if (!element.name) continue;
+    element.value = getAtPath(currentProfile, element.name.split(".")) ?? "";
+  }
+  updateRegionOptions();
+}
+
+function readProfileForm(currentProfile) {
+  const updated = {
+    ...currentProfile,
+    personal: { ...(currentProfile.personal || {}) },
+    address: { ...(currentProfile.address || {}) },
+    education: { ...(currentProfile.education || {}) },
+    links: { ...(currentProfile.links || {}) }
+  };
+  for (const element of profileForm.elements) {
+    if (!element.name) continue;
+    setAtPath(updated, element.name.split("."), element.value.trim());
+  }
+  const selectedCountry = profileHelpers.getCountry(updated.personal.phoneCountry);
+  updated.personal.phoneCountryCode = selectedCountry?.dialCode || "";
+  updated.personal.phone = profileHelpers.combinePhone(
+    updated.personal.phoneCountryCode,
+    updated.personal.phoneNumber
+  );
+  return updated;
+}
+
+function updateRegionOptions() {
+  const regions = profileHelpers.getCountry(locationCountry.value)?.regions || [];
+  regionOptions.replaceChildren(...regions.map((region) => {
+    const option = document.createElement("option");
+    option.value = region;
+    return option;
+  }));
+}
+
+function getAtPath(target, path) {
+  return path.reduce((current, part) => current?.[part], target);
+}
+
+function setAtPath(target, path, value) {
+  let current = target;
+  path.forEach((part, index) => {
+    if (index === path.length - 1) current[part] = value;
+    else current = current[part] ||= {};
+  });
+}
+
 function renderProfile(currentProfile, ai) {
   const required = [
     currentProfile?.personal?.firstName && currentProfile?.personal?.lastName,
@@ -116,6 +215,8 @@ function renderNoApplication(text) {
 }
 
 function renderPreviewState() {
+  profile = profileHelpers.migrateProfile({});
+  populateProfileForm(profile);
   pageTitle.textContent = "Current application";
   pageHost.textContent = "Open a job application to get started.";
   readyStatus.textContent = "Nothing to review just yet.";

@@ -5,6 +5,10 @@ const endpointInput = document.getElementById("endpoint");
 const saveStatus = document.getElementById("save-status");
 const testStatus = document.getElementById("test-status");
 const testButton = document.getElementById("test-ai");
+const phoneCountry = document.getElementById("phone-country");
+const locationCountry = document.getElementById("location-country");
+const regionOptions = document.getElementById("region-options");
+const profileHelpers = globalThis.KoalifiedProfile;
 
 const PROVIDER_DEFAULTS = {
   gemini: {
@@ -21,7 +25,10 @@ initialize();
 
 async function initialize() {
   const stored = await chrome.storage.local.get(["profile", "ai"]);
-  setFormValues({ ...(stored.profile || {}), ai: stored.ai || {} });
+  populateCountrySelects();
+  const profile = profileHelpers.migrateProfile(stored.profile || {});
+  setFormValues({ ...profile, ai: stored.ai || {} });
+  updateRegionOptions();
   updateProviderFields(false);
 }
 
@@ -32,6 +39,7 @@ form.addEventListener("submit", async (event) => {
 });
 
 providerSelect.addEventListener("change", () => updateProviderFields(true));
+locationCountry.addEventListener("change", updateRegionOptions);
 
 testButton.addEventListener("click", async () => {
   testButton.disabled = true;
@@ -81,7 +89,37 @@ function updateProviderFields(resetDefaults) {
 
 async function saveSettings() {
   const data = getFormValues();
+  const selectedPhoneCountry = profileHelpers.getCountry(data.profile.personal.phoneCountry);
+  data.profile.personal.phoneCountryCode = selectedPhoneCountry?.dialCode || "";
+  data.profile.personal.phone = profileHelpers.combinePhone(
+    data.profile.personal.phoneCountryCode,
+    data.profile.personal.phoneNumber
+  );
   await chrome.storage.local.set({ profile: data.profile, ai: data.ai });
+}
+
+function populateCountrySelects() {
+  phoneCountry.replaceChildren(...profileHelpers.COUNTRIES.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = `${item.name} (${item.dialCode})`;
+    return option;
+  }));
+  locationCountry.replaceChildren(...profileHelpers.COUNTRIES.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = item.name;
+    return option;
+  }));
+}
+
+function updateRegionOptions() {
+  const regions = profileHelpers.getCountry(locationCountry.value)?.regions || [];
+  regionOptions.replaceChildren(...regions.map((region) => {
+    const option = document.createElement("option");
+    option.value = region;
+    return option;
+  }));
 }
 
 function getFormValues() {

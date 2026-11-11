@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "koalified",
+  "version": "0.1.0",
+  "description": "A little local-first help with repetitive job application fields.",
+  "icons": {
+    "16": "public/icons/icon-16.png",
+    "32": "public/icons/icon-32.png",
+    "48": "public/icons/icon-48.png",
+    "128": "public/icons/icon-128.png"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://api.groq.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "optional_host_permissions": ["https://*/*"],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "koalified",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "public/icons/icon-16.png",
+      "32": "public/icons/icon-32.png"
+    }
+  },
+  "commands": {
+    "autofill-page": {
+      "suggested_key": {
+        "default": "Alt+A",
+        "mac": "Alt+A"
+      },
+      "description": "Autofill the current page with koalified"
+    }
+  },
+  "options_page": "src/options/options.html"
+}

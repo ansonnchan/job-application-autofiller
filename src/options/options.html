@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>koalified profile</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell brand"><span class="mascot-wrap"><img src="../../public/icons/koalified-head.png" alt=""></span><div><h1>koalified</h1><p>your local application profile</p></div></div>
+    </header>
+    <main class="shell">
+      <div class="notice"><strong>Stored locally.</strong> koalified does not sync this profile or send it anywhere unless you explicitly request an AI draft.</div>
+      <form id="settings-form">
+        <section>
+          <div class="section-heading"><div><h2>Personal details</h2><p>Used for common contact fields.</p></div></div>
+          <div class="grid two">
+            <label>First name<input name="personal.firstName" autocomplete="given-name"></label>
+            <label>Last name<input name="personal.lastName" autocomplete="family-name"></label>
+            <label>Preferred name<input name="personal.preferredName"></label>
+            <label>Email<input name="personal.email" type="email" autocomplete="email"></label>
+            <label>Phone<input name="personal.phone" type="tel" autocomplete="tel"></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>Address</h2><p>Leave any field blank if you do not want it proposed.</p></div></div>
+          <div class="grid two">
+            <label class="wide">Address line 1<input name="address.line1" autocomplete="address-line1"></label>
+            <label class="wide">Address line 2<input name="address.line2" autocomplete="address-line2"></label>
+            <label>City<input name="address.city" autocomplete="address-level2"></label>
+            <label>Province / state<input name="address.region" autocomplete="address-level1"></label>
+            <label>Postal / ZIP code<input name="address.postalCode" autocomplete="postal-code"></label>
+            <label>Country<input name="address.country" autocomplete="country-name"></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>Links</h2><p>Professional profiles and portfolio.</p></div></div>
+          <div class="grid two">
+            <label>LinkedIn URL<input name="links.linkedin" type="url"></label>
+            <label>GitHub URL<input name="links.github" type="url"></label>
+            <label class="wide">Portfolio URL<input name="links.portfolio" type="url"></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>Education</h2><p>The first version supports one primary education entry.</p></div></div>
+          <div class="grid two">
+            <label class="wide">School / university<input name="education.school"></label>
+            <label>Degree<input name="education.degree" placeholder="Bachelor of Applied Science"></label>
+            <label>Field of study<input name="education.fieldOfStudy" placeholder="Computer Engineering"></label>
+            <label>Start date<input name="education.startDate" type="month"></label>
+            <label>Expected graduation<input name="education.graduationDate" type="month"></label>
+            <label>GPA<input name="education.gpa"></label>
+            <label class="wide">Degree dropdown fallbacks<input name="education.degreeAliases" placeholder="Engineering, Bachelor of Engineering"><small>Comma-separated alternatives used only when the exact degree is unavailable.</small></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>Experience</h2><p>Truthful context for short-answer drafts.</p></div></div>
+          <div class="grid">
+            <label>Experience notes<textarea name="experienceContext" rows="7" placeholder="Projects, roles, achievements, technologies, and facts an AI draft may use."></textarea></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>Résumé context</h2><p>Used only for AI drafts you explicitly request.</p></div></div>
+          <div class="grid">
+            <label>Résumé text<textarea name="resumeText" rows="12" placeholder="Paste résumé text here. Local PDF extraction will be added next."></textarea></label>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading"><div><h2>AI provider</h2><p>Optional. The key is stored locally in plain extension storage.</p></div></div>
+          <div class="grid two">
+            <label>Provider
+              <select name="ai.provider" id="provider">
+                <option value="gemini">Gemini</option>
+                <option value="openai-compatible">OpenAI-compatible / Groq</option>
+              </select>
+            </label>
+            <label>Model<input name="ai.model" id="model" spellcheck="false"></label>
+            <label class="wide">API key<input name="ai.apiKey" type="password" autocomplete="off" spellcheck="false"></label>
+            <label class="wide compatible-only">Chat-completions endpoint<input name="ai.endpoint" type="url" id="endpoint" spellcheck="false"></label>
+          </div>
+          <div class="provider-actions"><button type="button" class="secondary" id="test-ai">Save and test provider</button><span id="test-status" role="status"></span></div>
+        </section>
+
+        <div class="save-bar"><span id="save-status" role="status"></span><button type="submit">Save profile</button></div>
+      </form>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

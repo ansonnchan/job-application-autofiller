@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --text: #293b34;
+  --muted: #78857b;
+  --accent: #567c65;
+  --accent-hover: #456b54;
+  --accent-surface: #e8ede5;
+  --border: #e0e4dc;
+  --error: #b85c56;
+  font-family: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { width: 390px; margin: 0; background: var(--bg); color: var(--text); }
+button { color: inherit; font: inherit; }
+svg { width: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+
+.app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px 14px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mascot-wrap { display: grid; width: 50px; height: 50px; overflow: hidden; place-items: center; border-radius: 15px; background: var(--accent-surface); }
+.mascot-wrap img { width: 46px; height: 46px; object-fit: cover; }
+h1 { margin: 0; font-size: 20px; font-weight: 720; letter-spacing: -.3px; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.icon-button { display: grid; width: 36px; height: 36px; border: 0; place-items: center; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.icon-button:hover, .icon-button:focus-visible { background: var(--accent-surface); color: var(--text); }
+
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 18px; border-radius: 16px; padding: 4px; background: var(--accent-surface); }
+.tab { min-height: 42px; border: 0; border-radius: 13px; background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; }
+.tab.active { background: var(--surface); color: var(--text); font-weight: 650; box-shadow: 0 1px 2px rgba(41, 59, 52, .05); }
+
+main { padding: 16px 18px 18px; }
+.application-card { min-height: 118px; border: 1px solid var(--border); border-radius: 18px; padding: 17px 18px; background: var(--surface); }
+.application-heading { display: flex; align-items: center; gap: 9px; color: var(--accent); }
+.application-heading svg { width: 20px; }
+h2 { margin: 0; color: var(--text); font-size: 17px; font-weight: 680; }
+.application-card > strong { display: block; overflow: hidden; margin-top: 17px; color: var(--text); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.application-card > span { display: block; overflow: hidden; margin-top: 3px; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+.primary-action { display: flex; width: 100%; min-height: 54px; align-items: center; justify-content: center; gap: 10px; margin-top: 13px; border: 0; border-radius: 16px; background: var(--accent); color: #fff; font-size: 16px; font-weight: 670; cursor: pointer; }
+.primary-action:hover, .primary-action:focus-visible { background: var(--accent-hover); }
+.primary-action:disabled { cursor: default; opacity: .55; }
+.primary-action svg { width: 20px; }
+.ready { min-height: 18px; margin: 8px 0 0; color: var(--accent); font-size: 11px; text-align: center; }
+.assurance { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 5px 0 17px; color: var(--muted); font-size: 11px; }
+.assurance svg { width: 16px; color: var(--accent); }
+
+.status-list { border-top: 1px solid var(--border); padding-top: 8px; }
+.status-row { display: grid; width: 100%; min-height: 56px; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 0; padding: 8px 3px; background: transparent; text-align: left; }
+button.status-row { cursor: pointer; }
+button.status-row:hover, button.status-row:focus-visible { color: var(--accent-hover); }
+.status-row > svg:first-child { width: 21px; color: var(--accent); }
+.status-row span { min-width: 0; }
+.status-row strong, .status-row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-row strong { font-size: 13px; font-weight: 600; }
+.status-row small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.row-action { color: var(--accent); font-size: 11px; }
+.row-action b { margin-left: 3px; font-size: 17px; font-weight: 400; }
+.check { width: 20px; color: var(--accent); }
+.compact-row { border-top: 1px solid var(--border); }
+.message { min-height: 15px; margin: 6px 0 0; color: var(--error); font-size: 11px; text-align: center; }

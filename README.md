@@ -16,7 +16,9 @@ koalified keeps your reusable application details in your local Chrome profile, 
 
 The current version includes:
 
-- A local profile for contact details, addresses, links, education, experience notes, and résumé text.
+- An in-popup profile editor for contact details, location, links, and education, with advanced experience, résumé, and AI settings available from the gear menu.
+- Structured phone input with selectable country calling codes while retaining a combined number for application forms.
+- Country selection plus province/state suggestions for Canada and the United States.
 - Generic field recognition using labels, accessibility attributes, names, IDs, and placeholders.
 - A review panel where values can be edited, included, or excluded before filling.
 - Native text, select, date, and month input handling with framework-compatible events.
@@ -68,8 +70,9 @@ No Chrome Web Store account or fee is needed.
 2. Open `chrome://extensions` in Chrome.
 3. Enable **Developer mode**.
 4. Click **Load unpacked** and select this repository directory.
-5. Open koalified's **Details**, then **Extension options**, and complete your profile.
-6. Pin koalified, open a job application, and choose **Review this page**.
+5. Pin koalified and use **My profile** inside the popup to add your core information.
+6. Use the gear menu for experience, résumé, and optional AI settings.
+7. Open a job application and choose **Review this page**.
 
 After pulling or editing code, reload the extension from `chrome://extensions` and refresh the application page.
 
